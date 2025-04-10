@@ -1,53 +1,59 @@
-import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios'; // Import Axios
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../AuthContext';
 
-export const AuthContext = createContext();
+function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState('customer'); // Default role
+  const { loginCustomer, loginAdmin, loginSeller, error } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
+  };
 
-  useEffect(() => {
-    // Check for user session (e.g., from localStorage)
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
-
-  const login = async (username, password) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(
-        'https://db-group5-452710.wl.r.appspot.com/login', // Replace with your login API endpoint
-        { username, password }
-      );
-
-      const userData = response.data; // Assuming your API returns user data on successful login
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData)); // Store user in localStorage
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error; // Propagate the error to the component
+      if (selectedRole === 'customer') {
+        await loginCustomer(username, password);
+      } else if (selectedRole === 'admin') {
+        await loginAdmin(username, password);
+      } else if (selectedRole === 'seller') {
+        await loginSeller(username, password);
+      }
+      navigate('/dashboard'); // Redirect after successful login
+    } catch (err) {
+      // Error is already set in AuthContext
     }
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user'); // Remove user from localStorage
-    // Optionally, you might want to call a logout API endpoint here
-  };
-
-  const contextValue = {
-    user,
-    login,
-    logout,
-    loading,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {!loading && children}
-    </AuthContext.Provider>
+    <div>
+      <h2>Login</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Role:</label>
+          <select value={selectedRole} onChange={handleRoleChange}>
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+          </select>
+        </div>
+        <div>
+          <label>Username:</label>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
-};
+}
+
+export default Login;
