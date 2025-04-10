@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; // Import at the top of your file
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -11,28 +12,33 @@ function AdminDashboard() {
   const [editingUser, setEditingUser] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
 
+
+  const fetchAdminData = async () => {
+    try {
+      const usersResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/user'); // Replace with your admin users API endpoint
+      const productsResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/product'); // Replace with your admin products API endpoint
+
+      setUsers(usersResponse.data);
+      setProducts(productsResponse.data);
+    } catch (err) {
+      setError(err.message || 'Could not fetch admin data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const usersResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/user'); // Replace with your admin users API endpoint
-        const productsResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/product'); // Replace with your admin products API endpoint
-
-        setUsers(usersResponse.data);
-        setProducts(productsResponse.data);
-      } catch (err) {
-        setError(err.message || 'Could not fetch admin data.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAdminData();
   }, []);
+
+
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://db-group5-452710.wl.r.appspot.com/user', newUser); // Replace with your create user API endpoint
+      const userToCreate = { ...newUser, user_id: uuidv4() };
+      await axios.post('https://db-group5-452710.wl.r.appspot.com/user', userToCreate); // Replace with your create user API endpoint
       fetchAdminData(); // Refresh data after creation
       setNewUser({ username: '', email: '', password: '', role: 'customer' });
     } catch (err) {
