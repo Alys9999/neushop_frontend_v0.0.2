@@ -21,10 +21,10 @@ function Login() {
         navigate('/'); // Redirect customer to home page
       } else if (selectedRole === 'admin') {
         await loginAdmin(username, password);
-        navigate('/admin/dashboard'); // Redirect admin to dashboard
+        navigate('/admin-dashboard'); // Redirect admin to dashboard
       } else if (selectedRole === 'seller') {
         await loginSeller(username, password);
-        navigate('/seller/dashboard'); // Redirect seller to dashboard
+        navigate('/seller-dashboard'); // Redirect seller to dashboard
       }
     } catch (err) {
       // Error is already being managed and displayed from AuthContext
