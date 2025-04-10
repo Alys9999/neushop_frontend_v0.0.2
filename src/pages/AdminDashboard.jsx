@@ -14,8 +14,8 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const usersResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/admin/users'); // Replace with your admin users API endpoint
-        const productsResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/admin/products'); // Replace with your admin products API endpoint
+        const usersResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/user'); // Replace with your admin users API endpoint
+        const productsResponse = await axios.get('https://db-group5-452710.wl.r.appspot.com/product'); // Replace with your admin products API endpoint
 
         setUsers(usersResponse.data);
         setProducts(productsResponse.data);
@@ -32,7 +32,7 @@ function AdminDashboard() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://db-group5-452710.wl.r.appspot.com/admin/users', newUser); // Replace with your create user API endpoint
+      await axios.post('https://db-group5-452710.wl.r.appspot.com/user', newUser); // Replace with your create user API endpoint
       fetchAdminData(); // Refresh data after creation
       setNewUser({ username: '', email: '', password: '', role: 'customer' });
     } catch (err) {
@@ -43,7 +43,7 @@ function AdminDashboard() {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`https://db-group5-452710.wl.r.appspot.com/admin/users/${editingUser?.user_id}`, editingUser); // Replace with your update user API endpoint
+      await axios.put(`https://db-group5-452710.wl.r.appspot.com/user/${editingUser?.user_id}`, editingUser); // Replace with your update user API endpoint
       fetchAdminData();
       setEditingUser(null);
     } catch (err) {
@@ -53,7 +53,7 @@ function AdminDashboard() {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`https://db-group5-452710.wl.r.appspot.com/users/${userId}`); // Replace with your delete user API endpoint
+      await axios.delete(`https://db-group5-452710.wl.r.appspot.com/user/${userId}`); // Replace with your delete user API endpoint
       fetchAdminData();
     } catch (err) {
       setError(err.message || 'Could not delete user.');
@@ -63,7 +63,7 @@ function AdminDashboard() {
   const handleCreateProduct = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://db-group5-452710.wl.r.appspot.com/admin/products', newProduct); // Replace with your create product API endpoint
+      await axios.post('https://db-group5-452710.wl.r.appspot.com/product', newProduct); // Replace with your create product API endpoint
       fetchAdminData();
       setNewProduct({ name: '', description: '', price: 0, stock_quantity: 0 });
     } catch (err) {
@@ -74,7 +74,7 @@ function AdminDashboard() {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`https://db-group5-452710.wl.r.appspot.com/admin/products/${editingProduct?.product_id}`, editingProduct); // Replace with your update product API endpoint
+      await axios.put(`https://db-group5-452710.wl.r.appspot.com/product/${editingProduct?.product_id}`, editingProduct); // Replace with your update product API endpoint
       fetchAdminData();
       setEditingProduct(null);
     } catch (err) {
@@ -84,7 +84,7 @@ function AdminDashboard() {
 
   const handleDeleteProduct = async (productId) => {
     try {
-      await axios.delete(`https://db-group5-452710.wl.r.appspot.com/admin/products/${productId}`); // Replace with your delete product API endpoint
+      await axios.delete(`https://db-group5-452710.wl.r.appspot.com/product/${productId}`); // Replace with your delete product API endpoint
       fetchAdminData();
     } catch (err) {
       setError(err.message || 'Could not delete product.');
