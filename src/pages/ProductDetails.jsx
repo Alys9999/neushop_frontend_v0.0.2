@@ -14,7 +14,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://db-group5-452710.wl.r.appspot.com`); // Replace with your product details API endpoint
+        const response = await axios.get(`https://db-group5-452710.wl.r.appspot.com/products/${productId}`); // Replace with your product details API endpoint
         setProduct(response.data);
       } catch (err) {
         setError(err.message || 'Could not fetch product details.');
