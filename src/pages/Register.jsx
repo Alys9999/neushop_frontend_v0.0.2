@@ -8,6 +8,8 @@ function Register() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [registerType, setRegisterType] = useState('customer'); // Default to customer registration
+  const [storeName, setStoreName] = useState('');
+  const [businessLicense, setBusinessLicense] = useState('');
   const navigate = useNavigate();
 
   const handleCustomerRegisterSelect = () => {
@@ -26,15 +28,17 @@ function Register() {
     e.preventDefault();
     setError('');
     let registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register'; // Default customer registration
+    let registrationData = { username, password, email };
 
     if (registerType === 'admin') {
       registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register/admin'; // You'll need to create this backend route
     } else if (registerType === 'seller') {
       registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register/seller'; // You'll need to create this backend route
+      registrationData = { ...registrationData, store_name: storeName, business_license: businessLicense };
     }
 
     try {
-      await axios.post(registrationEndpoint, { username, password, email });
+      await axios.post(registrationEndpoint, registrationData);
       navigate('/login'); // Redirect to login after successful registration
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -107,6 +111,38 @@ function Register() {
             required
           />
         </div>
+
+        {registerType === 'seller' && (
+          <>
+            <div className="mb-4">
+              <label htmlFor="storeName" className="block text-gray-700 text-sm font-bold mb-2">
+                Store Name
+              </label>
+              <input
+                type="text"
+                id="storeName"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="businessLicense" className="block text-gray-700 text-sm font-bold mb-2">
+                Business License
+              </label>
+              <input
+                type="text"
+                id="businessLicense"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={businessLicense}
+                onChange={(e) => setBusinessLicense(e.target.value)}
+                required
+              />
+            </div>
+          </>
+        )}
+
         <div className="flex items-center justify-between">
           <button
             type="submit"
