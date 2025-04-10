@@ -1,59 +1,80 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../AuthContext';
+import React, { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
-function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('customer'); // Default role
-  const { loginCustomer, loginAdmin, loginSeller, error } = useContext(AuthContext);
-  const navigate = useNavigate();
+export const AuthContext = createContext();
 
-  const handleRoleChange = (event) => {
-    setSelectedRole(event.target.value);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // Add role state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(''); // Add error state for login feedback
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedRole = localStorage.getItem('role');
+    if (storedUser && storedRole) {
+      setUser(JSON.parse(storedUser));
+      setRole(storedRole);
+    }
+    setLoading(false);
+  }, []);
+
+  const loginCustomer = async (username, password) => {
+    return await login('https://db-group5-452710.wl.r.appspot.com/login/customer', 'customer', username, password);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const loginAdmin = async (username, password) => {
+    return await login('https://db-group5-452710.wl.r.appspot.com/login/admin', 'admin', username, password);
+  };
+
+  const loginSeller = async (username, password) => {
+    return await login('https://db-group5-452710.wl.r.appspot.com/login/seller', 'seller', username, password);
+  };
+
+  const login = async (url, assignedRole, username, password) => {
     try {
-      if (selectedRole === 'customer') {
-        await loginCustomer(username, password);
-      } else if (selectedRole === 'admin') {
-        await loginAdmin(username, password);
-      } else if (selectedRole === 'seller') {
-        await loginSeller(username, password);
-      }
-      navigate('/dashboard'); // Redirect after successful login
-    } catch (err) {
-      // Error is already set in AuthContext
+      const response = await axios.post(
+        url,
+        { username, password }
+      );
+
+      const userData = response.data;
+      setUser(userData);
+      setRole(assignedRole);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('role', assignedRole);
+      setError('');
+      return true; // Indicate successful login
+    } catch (error) {
+      console.error(`Login as ${assignedRole} failed:`, error);
+      setError('Invalid username or password for this role.');
+      throw error;
     }
   };
 
-  return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Role:</label>
-          <select value={selectedRole} onChange={handleRoleChange}>
-            <option value="customer">Customer</option>
-            <option value="admin">Admin</option>
-            <option value="seller">Seller</option>
-          </select>
-        </div>
-        <div>
-          <label>Username:</label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
-}
+  const logout = () => {
+    setUser(null);
+    setRole(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    setError(''); // Clear any previous error messages
+    // Optionally, call a logout API
+  };
 
-export default Login;
+  const contextValue = {
+    user,
+    role,
+    loginCustomer,
+    loginAdmin,
+    loginSeller,
+    logout,
+    loading,
+    error, // Expose the error state
+  };
+
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
