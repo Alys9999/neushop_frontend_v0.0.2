@@ -7,14 +7,35 @@ function Register() {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [registerType, setRegisterType] = useState('customer'); // Default to customer registration
   const navigate = useNavigate();
+
+  const handleCustomerRegisterSelect = () => {
+    setRegisterType('customer');
+  };
+
+  const handleAdminRegisterSelect = () => {
+    setRegisterType('admin');
+  };
+
+  const handleSellerRegisterSelect = () => {
+    setRegisterType('seller');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    let registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register'; // Default customer registration
+
+    if (registerType === 'admin') {
+      registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register/admin'; // You'll need to create this backend route
+    } else if (registerType === 'seller') {
+      registrationEndpoint = 'https://db-group5-452710.wl.r.appspot.com/register/seller'; // You'll need to create this backend route
+    }
+
     try {
-      await axios.post('https://db-group5-452710.wl.r.appspot.com/register', { username, password, email }); // Replace with your register API endpoint
-      navigate('/login');
+      await axios.post(registrationEndpoint, { username, password, email });
+      navigate('/login'); // Redirect to login after successful registration
     } catch (err) {
       setError('Registration failed. Please try again.');
     }
@@ -23,6 +44,28 @@ function Register() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Register</h1>
+
+      <div className="mb-4">
+        <button
+          onClick={handleCustomerRegisterSelect}
+          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 ${registerType === 'customer' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Customer Register
+        </button>
+        <button
+          onClick={handleAdminRegisterSelect}
+          className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 ${registerType === 'admin' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Admin Register
+        </button>
+        <button
+          onClick={handleSellerRegisterSelect}
+          className={`bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ${registerType === 'seller' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Seller Register
+        </button>
+      </div>
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
         <div className="mb-4">
