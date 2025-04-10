@@ -6,17 +6,26 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useContext(AuthContext);
+  const { login, role } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
     try {
-      await login(username, password);
-      navigate('/');
+      const success = await login(username, password);
+      if (success) {
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (role === 'seller') {
+          navigate('/seller/dashboard');
+        } else {
+          navigate('/'); // Default to customer dashboard/homepage
+        }
+      }
     } catch (err) {
-      setError('Invalid username or password.');
+      // Error is already set in AuthContext
     }
   };
 
