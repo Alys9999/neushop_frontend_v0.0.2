@@ -12,16 +12,8 @@ function Register() {
   const [businessLicense, setBusinessLicense] = useState('');
   const navigate = useNavigate();
 
-  const handleCustomerRegisterSelect = () => {
-    setRegisterType('customer');
-  };
-
-  const handleAdminRegisterSelect = () => {
-    setRegisterType('admin');
-  };
-
-  const handleSellerRegisterSelect = () => {
-    setRegisterType('seller');
+  const handleRoleChange = (event) => {
+    setRegisterType(event.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -50,24 +42,19 @@ function Register() {
       <h1 className="text-2xl font-bold mb-4">Register</h1>
 
       <div className="mb-4">
-        <button
-          onClick={handleCustomerRegisterSelect}
-          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 ${registerType === 'customer' ? 'opacity-100' : 'opacity-50'}`}
+        <label htmlFor="role" className="block text-gray-700 text-sm font-bold mb-2">
+          Register As:
+        </label>
+        <select
+          id="role"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={registerType}
+          onChange={handleRoleChange}
         >
-          Customer Register
-        </button>
-        <button
-          onClick={handleAdminRegisterSelect}
-          className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 ${registerType === 'admin' ? 'opacity-100' : 'opacity-50'}`}
-        >
-          Admin Register
-        </button>
-        <button
-          onClick={handleSellerRegisterSelect}
-          className={`bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ${registerType === 'seller' ? 'opacity-100' : 'opacity-50'}`}
-        >
-          Seller Register
-        </button>
+          <option value="customer">Customer</option>
+          <option value="admin">Admin</option>
+          <option value="seller">Seller</option>
+        </select>
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -146,11 +133,11 @@ function Register() {
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Register
           </button>
-          <Link to="/login" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+          <Link to="/login" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mt-2">
             Already have an account? Login
           </Link>
         </div>
