@@ -6,32 +6,64 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, role } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [loginType, setLoginType] = useState('customer'); // Default to customer login
+
+  const handleAdminLogin = () => {
+    setLoginType('admin');
+  };
+
+  const handleSellerLogin = () => {
+    setLoginType('seller');
+  };
+
+  const handleCustomerLogin = () => {
+    setLoginType('customer');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
     try {
-      const success = await login(username, password);
-      if (success) {
-        if (role === 'admin') {
-          navigate('/admin/dashboard');
-        } else if (role === 'seller') {
-          navigate('/seller/dashboard');
-        } else {
-          navigate('/'); // Default to customer dashboard/homepage
-        }
+      await login(username, password);
+      if (loginType === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (loginType === 'seller') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/'); // Default to customer dashboard/homepage
       }
     } catch (err) {
-      // Error is already set in AuthContext
+      setError('Invalid username or password.');
     }
   };
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
+
+      <div className="mb-4">
+        <button
+          onClick={handleCustomerLogin}
+          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 ${loginType === 'customer' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Customer Login
+        </button>
+        <button
+          onClick={handleAdminLogin}
+          className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 ${loginType === 'admin' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Admin Login
+        </button>
+        <button
+          onClick={handleSellerLogin}
+          className={`bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ${loginType === 'seller' ? 'opacity-100' : 'opacity-50'}`}
+        >
+          Seller Login
+        </button>
+      </div>
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
         <div className="mb-4">
